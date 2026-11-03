@@ -1,0 +1,213 @@
+@model MenderaQociDFMS.Models.Resident
+@{
+    ViewData["Title"] = $"Resident Profile - {Model.FullName}";
+}
+
+<div class="d-flex justify-content-between align-items-center kebele-header">
+    <div>
+        <h3 class="fw-bold text-success mb-0"><i class="bi bi-person-vcard me-2"></i>Resident Profile: @Model.FullName</h3>
+        <span class="text-muted small">Resident ID: #@Model.ResidentId | Registration Date: @Model.RegistrationDate.ToString("yyyy-MM-dd")</span>
+    </div>
+    <div class="no-print">
+        <a asp-action="Edit" asp-route-id="@Model.ResidentId" class="btn btn-outline-primary btn-sm me-1"><i class="bi bi-pencil"></i> Edit Profile</a>
+        @{
+            var activeIdRecord = Model.KebeleIdRecords.FirstOrDefault(k => k.IdStatus == "Active" && k.ExpiryDate >= DateTime.Now);
+        }
+        @if (activeIdRecord != null)
+        {
+            <a asp-controller="KebeleIds" asp-action="CardPreview" asp-route-id="@activeIdRecord.IdRecordId" class="btn btn-warning btn-sm me-1 fw-bold text-dark"><i class="bi bi-person-badge me-1"></i> Preview / Print Kebele ID</a>
+        }
+        else
+        {
+            <a asp-controller="KebeleIds" asp-action="Create" asp-route-residentId="@Model.ResidentId" class="btn btn-success btn-sm me-1"><i class="bi bi-card-heading"></i> Issue / Generate Kebele ID</a>
+        }
+        <a asp-controller="Correspondence" asp-action="Create" asp-route-residentId="@Model.ResidentId" class="btn btn-outline-secondary btn-sm me-1"><i class="bi bi-file-earmark-plus"></i> New Correspondence</a>
+        <button onclick="window.print()" class="btn btn-dark btn-sm"><i class="bi bi-printer"></i> Print Profile</button>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Main Profile Card -->
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-light fw-bold py-3 d-flex justify-content-between align-items-center">
+                <span><i class="bi bi-info-circle text-success me-2"></i>Personal Demographics</span>
+                <span class="badge bg-light text-dark border">#@Model.ResidentId</span>
+            </div>
+            <div class="card-body">
+                <div class="text-center mb-3">
+                    @if (!string.IsNullOrEmpty(Model.PhotoPath))
+                    {
+                        <img src="@Model.PhotoPath" alt="@Model.FullName" class="img-thumbnail rounded shadow-sm" style="width: 140px; height: 170px; object-fit: cover;" />
+                    }
+                    else
+                    {
+                        <div class="bg-light border rounded d-inline-flex align-items-center justify-content-center text-muted" style="width: 140px; height: 170px;">
+                            <div class="text-center">
+                                <i class="bi bi-person fs-1 d-block"></i>
+                                <span class="small">No Photo</span>
+                            </div>
+                        </div>
+                    }
+                    <div class="mt-2">
+                        <a asp-action="Edit" asp-route-id="@Model.ResidentId" class="btn btn-sm btn-link text-decoration-none no-print">
+                            <i class="bi bi-camera me-1"></i>@(string.IsNullOrEmpty(Model.PhotoPath) ? "Upload / Capture Photo" : "Change Photo")
+                        </a>
+                    </div>
+                </div>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item d-flex justify-content-between px-0">
+                        <span class="text-muted">First Name:</span>
+                        <span class="fw-semibold">@Model.FirstName</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between px-0">
+                        <span class="text-muted">Last Name:</span>
+                        <span class="fw-semibold">@Model.LastName</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between px-0">
+                        <span class="text-muted">Gender:</span>
+                        <span class="fw-semibold">@Model.Gender</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between px-0">
+                        <span class="text-muted">Date of Birth:</span>
+                        <span class="fw-semibold">@Model.DateOfBirth.ToString("yyyy-MM-dd")</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between px-0">
+                        <span class="text-muted">Phone Number:</span>
+                        <span class="fw-semibold">@(Model.PhoneNumber ?? "-")</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between px-0">
+                        <span class="text-muted">Sub-Kebele:</span>
+                        <span class="fw-semibold text-success">@Model.SubKebele?.SubKebeleName</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between px-0">
+                        <span class="text-muted">Household Head:</span>
+                        <span class="fw-semibold">@(Model.HouseholdHead ?? "-")</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between px-0">
+                        <span class="text-muted">Status:</span>
+                        @if (Model.Status == "Active")
+                        {
+                            <span class="badge bg-success">Active</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-secondary">@Model.Status</span>
+                        }
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Related History Tabs -->
+    <div class="col-md-8">
+        <!-- Kebele ID Records History -->
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-white fw-bold d-flex justify-content-between align-items-center py-3">
+                <span><i class="bi bi-card-checklist text-success me-2"></i>Kebele ID Records & Renewal History</span>
+                <a asp-controller="KebeleIds" asp-action="Create" asp-route-residentId="@Model.ResidentId" class="btn btn-sm btn-outline-success no-print"><i class="bi bg-plus"></i> New ID</a>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>ID Number</th>
+                            <th>Issue Date</th>
+                            <th>Expiry Date</th>
+                            <th>Status</th>
+                            <th>Remarks</th>
+                            <th class="no-print">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (!Model.KebeleIdRecords.Any())
+                        {
+                            <tr>
+                                <td colspan="6" class="text-center py-3 text-muted">No Kebele ID issued yet.</td>
+                            </tr>
+                        }
+                        else
+                        {
+                            @foreach (var idRec in Model.KebeleIdRecords.OrderByDescending(k => k.IssueDate))
+                            {
+                                <tr>
+                                    <td class="fw-bold">@idRec.IdNumber</td>
+                                    <td>@idRec.IssueDate.ToString("yyyy-MM-dd")</td>
+                                    <td>@idRec.ExpiryDate.ToString("yyyy-MM-dd")</td>
+                                    <td>
+                                        @if (idRec.IdStatus == "Active" && idRec.ExpiryDate >= DateTime.Now)
+                                        {
+                                            <span class="badge bg-success">Active</span>
+                                        }
+                                        else if (idRec.ExpiryDate < DateTime.Now || idRec.IdStatus == "Expired")
+                                        {
+                                            <span class="badge bg-warning text-dark">Expired</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-secondary">@idRec.IdStatus</span>
+                                        }
+                                    </td>
+                                    <td class="small text-muted">@(idRec.Remarks ?? "-")</td>
+                                    <td class="no-print">
+                                        <a asp-controller="KebeleIds" asp-action="CardPreview" asp-route-id="@idRec.IdRecordId" class="btn btn-sm btn-outline-success py-0 me-1" title="Preview Kebele ID Card"><i class="bi bi-person-badge"></i> ID Card</a>
+                                        <a asp-controller="KebeleIds" asp-action="Details" asp-route-id="@idRec.IdRecordId" class="btn btn-sm btn-outline-primary py-0"><i class="bi bi-eye"></i> Record</a>
+                                        @if (idRec.IdStatus == "Active")
+                                        {
+                                            <a asp-controller="KebeleIds" asp-action="Renew" asp-route-id="@idRec.IdRecordId" class="btn btn-sm btn-outline-warning py-0 ms-1"><i class="bi bi-arrow-repeat"></i> Renew</a>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Official Correspondence History -->
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white fw-bold d-flex justify-content-between align-items-center py-3">
+                <span><i class="bi bi-file-earmark-text text-success me-2"></i>Official Correspondence & Issued Documents</span>
+                <a asp-controller="Correspondence" asp-action="Create" asp-route-residentId="@Model.ResidentId" class="btn btn-sm btn-outline-secondary no-print"><i class="bi bg-plus"></i> Record Document</a>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Ref Number</th>
+                            <th>Document Type</th>
+                            <th>Issue Date</th>
+                            <th>Purpose</th>
+                            <th class="no-print">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (!Model.Correspondences.Any())
+                        {
+                            <tr>
+                                <td colspan="5" class="text-center py-3 text-muted">No correspondence records recorded.</td>
+                            </tr>
+                        }
+                        else
+                        {
+                            @foreach (var cor in Model.Correspondences.OrderByDescending(c => c.IssueDate))
+                            {
+                                <tr>
+                                    <td class="fw-bold">@cor.ReferenceNumber</td>
+                                    <td><span class="badge bg-light text-dark border">@cor.DocumentType</span></td>
+                                    <td>@cor.IssueDate.ToString("yyyy-MM-dd")</td>
+                                    <td class="small">@cor.Purpose</td>
+                                    <td class="no-print">
+                                        <a asp-controller="Correspondence" asp-action="Details" asp-route-id="@cor.CorrespondenceId" class="btn btn-sm btn-outline-primary py-0"><i class="bi bi-eye"></i> Details</a>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

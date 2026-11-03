@@ -1,0 +1,153 @@
+@model MenderaQociDFMS.ViewModels.DashboardViewModel
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<div class="d-flex justify-content-between align-items-center kebele-header">
+    <div>
+        <h3 class="fw-bold text-success mb-0"><i class="bi bi-speedometer2 me-2"></i>Kebele Administration Dashboard</h3>
+        <span class="text-muted small">Mendera Qoci Kebele, Jimma</span>
+    </div>
+    <div>
+        <a asp-controller="Residents" asp-action="Create" class="btn btn-kebele btn-sm me-2"><i class="bi bi-person-plus me-1"></i> New Resident</a>
+        <a asp-controller="KebeleIds" asp-action="Create" class="btn btn-outline-success btn-sm me-2"><i class="bi bi-card-heading me-1"></i> Issue Kebele ID</a>
+        <a asp-controller="Correspondence" asp-action="Create" class="btn btn-outline-secondary btn-sm"><i class="bi bi-file-earmark-text me-1"></i> Record Correspondence</a>
+    </div>
+</div>
+
+<!-- Key Summary Metric Cards -->
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="card card-summary bg-primary text-white p-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h6 class="text-uppercase fw-semibold mb-1 opacity-75">Total Residents</h6>
+                    <h2 class="fw-bold mb-0">@Model.TotalResidents</h2>
+                    <small class="opacity-75">@Model.ActiveResidents Active</small>
+                </div>
+                <i class="bi bi-people fs-1 opacity-50"></i>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card card-summary bg-success text-white p-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h6 class="text-uppercase fw-semibold mb-1 opacity-75">Active Kebele IDs</h6>
+                    <h2 class="fw-bold mb-0">@Model.ActiveKebeleIds</h2>
+                    <small class="opacity-75">Issued & Valid</small>
+                </div>
+                <i class="bi bi-card-checkmark fs-1 opacity-50"></i>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card card-summary bg-warning text-dark p-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h6 class="text-uppercase fw-semibold mb-1 opacity-75">IDs Expiring Soon</h6>
+                    <h2 class="fw-bold mb-0">@Model.IdsExpiringSoon</h2>
+                    <small class="opacity-75">Next 30 Days</small>
+                </div>
+                <i class="bi bi-exclamation-circle fs-1 opacity-50"></i>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card card-summary bg-danger text-white p-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h6 class="text-uppercase fw-semibold mb-1 opacity-75">Expired IDs</h6>
+                    <h2 class="fw-bold mb-0">@Model.ExpiredKebeleIds</h2>
+                    <small class="opacity-75">Requires Renewal</small>
+                </div>
+                <i class="bi bi-card-heading fs-1 opacity-50"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3">
+    <!-- Recent Residents -->
+    <div class="col-md-6">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white fw-bold d-flex justify-content-between align-items-center py-3">
+                <span><i class="bi bi-person-lines-fill text-success me-2"></i>Recently Registered Residents</span>
+                <a asp-controller="Residents" asp-action="Index" class="btn btn-link btn-sm text-decoration-none">View All</a>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Full Name</th>
+                            <th>Sub-Kebele</th>
+                            <th>Phone</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var res in Model.RecentResidents)
+                        {
+                            <tr>
+                                <td class="fw-semibold">@res.FullName</td>
+                                <td>@res.SubKebele?.SubKebeleName</td>
+                                <td>@(res.PhoneNumber ?? "-")</td>
+                                <td><span class="badge bg-success">@res.Status</span></td>
+                                <td>
+                                    <a asp-controller="Residents" asp-action="Details" asp-route-id="@res.ResidentId" class="btn btn-sm btn-outline-primary py-0"><i class="bi bi-eye"></i> View</a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent ID Issuances -->
+    <div class="col-md-6">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white fw-bold d-flex justify-content-between align-items-center py-3">
+                <span><i class="bi bi-card-list text-success me-2"></i>Recent Kebele ID Records</span>
+                <a asp-controller="KebeleIds" asp-action="Index" class="btn btn-link btn-sm text-decoration-none">View All</a>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>ID Number</th>
+                            <th>Resident</th>
+                            <th>Expiry Date</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var idRec in Model.RecentIdRecords)
+                        {
+                            <tr>
+                                <td class="fw-bold">@idRec.IdNumber</td>
+                                <td>@idRec.Resident?.FullName</td>
+                                <td>@idRec.ExpiryDate.ToString("yyyy-MM-dd")</td>
+                                <td>
+                                    @if (idRec.IdStatus == "Active")
+                                    {
+                                        <span class="badge bg-success">Active</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary">@idRec.IdStatus</span>
+                                    }
+                                </td>
+                                <td>
+                                    <a asp-controller="KebeleIds" asp-action="Details" asp-route-id="@idRec.IdRecordId" class="btn btn-sm btn-outline-primary py-0"><i class="bi bi-eye"></i> View</a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,111 @@
+@{
+    ViewData["Title"] = "Kebele Statistical Reports";
+    var resRep = (MenderaQociDFMS.ViewModels.ResidentReportViewModel)ViewBag.ResidentReport;
+    var idRep = (MenderaQociDFMS.ViewModels.IdReportViewModel)ViewBag.IdReport;
+    var expRep = (MenderaQociDFMS.ViewModels.ExpiringIdReportViewModel)ViewBag.ExpiringReport;
+    var corRep = (MenderaQociDFMS.ViewModels.CorrespondenceReportViewModel)ViewBag.CorrespondenceReport;
+}
+
+<div class="d-flex justify-content-between align-items-center kebele-header">
+    <div>
+        <h3 class="fw-bold text-success mb-0"><i class="bi bi-bar-chart-line me-2"></i>Kebele Administration Reports</h3>
+        <span class="text-muted small">Mendera Qoci Kebele Summary & Analytical Insights</span>
+    </div>
+    <button onclick="window.print()" class="btn btn-dark btn-sm no-print"><i class="bi bi-printer me-1"></i> Print Comprehensive Report</button>
+</div>
+
+<div class="row g-4">
+    <!-- Resident Summary Box -->
+    <div class="col-md-6">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white fw-bold d-flex justify-content-between align-items-center py-3">
+                <span><i class="bi bi-people text-success me-2"></i>Resident Demographics Summary</span>
+                <a asp-action="ResidentSummary" class="btn btn-link btn-sm text-decoration-none no-print">Full Detail</a>
+            </div>
+            <div class="card-body">
+                <div class="row text-center mb-3">
+                    <div class="col-6">
+                        <div class="p-3 border rounded bg-light">
+                            <span class="text-muted small d-block">Total Residents</span>
+                            <h3 class="fw-bold text-success mb-0">@resRep.TotalResidents</h3>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="p-3 border rounded bg-light">
+                            <span class="text-muted small d-block">Active Residents</span>
+                            <h3 class="fw-bold text-primary mb-0">@resRep.ActiveResidents</h3>
+                        </div>
+                    </div>
+                </div>
+                <h6>Distribution by Sub-Kebele:</h6>
+                <ul class="list-group list-group-flush">
+                    @foreach (var item in resRep.BySubKebele)
+                    {
+                        <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                            @item.SubKebeleName
+                            <span class="badge bg-success rounded-pill">@item.Count</span>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Kebele ID Summary Box -->
+    <div class="col-md-6">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white fw-bold d-flex justify-content-between align-items-center py-3">
+                <span><i class="bi bi-card-heading text-success me-2"></i>Kebele ID Status Summary</span>
+                <a asp-action="KebeleIdSummary" class="btn btn-link btn-sm text-decoration-none no-print">Full Detail</a>
+            </div>
+            <div class="card-body">
+                <div class="row g-2 text-center mb-3">
+                    <div class="col-4">
+                        <div class="p-2 border rounded bg-success text-white">
+                            <span class="small d-block opacity-75">Active IDs</span>
+                            <h4 class="fw-bold mb-0">@idRep.ActiveIds</h4>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="p-2 border rounded bg-warning text-dark">
+                            <span class="small d-block opacity-75">Expiring Soon</span>
+                            <h4 class="fw-bold mb-0">@expRep.TotalExpiringSoon</h4>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="p-2 border rounded bg-danger text-white">
+                            <span class="small d-block opacity-75">Expired IDs</span>
+                            <h4 class="fw-bold mb-0">@idRep.ExpiredIds</h4>
+                        </div>
+                    </div>
+                </div>
+                <div class="alert alert-light border small">
+                    <i class="bi bi-info-circle text-primary me-1"></i> Total Kebele ID records issued across historical log: <strong>@idRep.TotalIds</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Correspondences Summary Box -->
+    <div class="col-md-12">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white fw-bold d-flex justify-content-between align-items-center py-3">
+                <span><i class="bi bi-file-earmark-text text-success me-2"></i>Correspondence Breakdown by Document Type</span>
+                <a asp-action="CorrespondenceSummary" class="btn btn-link btn-sm text-decoration-none no-print">Full Detail</a>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    @foreach (var dt in corRep.ByDocumentType)
+                    {
+                        <div class="col-md-3">
+                            <div class="p-3 border rounded bg-light text-center">
+                                <span class="text-muted small d-block">@dt.DocumentType</span>
+                                <h3 class="fw-bold text-dark mb-0">@dt.Count</h3>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

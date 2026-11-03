@@ -1,0 +1,62 @@
+@model MenderaQociDFMS.ViewModels.ExpiringIdReportViewModel
+@{
+    ViewData["Title"] = "Expiring Kebele IDs Report";
+}
+
+<div class="d-flex justify-content-between align-items-center kebele-header">
+    <div>
+        <h3 class="fw-bold text-success mb-0"><i class="bi bi-exclamation-circle me-2"></i>Expiring Kebele IDs Report</h3>
+        <span class="text-muted small">Cards expiring within the next 30 days requiring staff renewal alert</span>
+    </div>
+    <button onclick="window.print()" class="btn btn-dark btn-sm no-print"><i class="bi bi-printer me-1"></i> Print Alert List</button>
+</div>
+
+<div class="card border-0 shadow-sm p-4">
+    <div class="alert alert-warning d-flex align-items-center mb-4">
+        <i class="bi bi-exclamation-triangle-fill fs-4 me-2"></i>
+        <div>
+            Total <strong>@Model.TotalExpiringSoon</strong> Kebele ID cards are set to expire within 30 days. Please notify resident holders for renewal processing.
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-bordered align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>ID Number</th>
+                    <th>Resident Name</th>
+                    <th>Sub-Kebele</th>
+                    <th>Phone</th>
+                    <th>Issue Date</th>
+                    <th>Expiry Date</th>
+                    <th class="no-print text-center">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!Model.ExpiringRecords.Any())
+                {
+                    <tr>
+                        <td colspan="7" class="text-center py-4 text-muted">No IDs expiring in the next 30 days.</td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var item in Model.ExpiringRecords)
+                    {
+                        <tr>
+                            <td class="fw-bold text-success">@item.IdNumber</td>
+                            <td class="fw-semibold">@item.Resident?.FullName</td>
+                            <td>@item.Resident?.SubKebele?.SubKebeleName</td>
+                            <td>@(item.Resident?.PhoneNumber ?? "-")</td>
+                            <td>@item.IssueDate.ToString("yyyy-MM-dd")</td>
+                            <td class="fw-bold text-danger">@item.ExpiryDate.ToString("yyyy-MM-dd")</td>
+                            <td class="no-print text-center">
+                                <a asp-controller="KebeleIds" asp-action="Renew" asp-route-id="@item.IdRecordId" class="btn btn-sm btn-success"><i class="bi bi-arrow-repeat me-1"></i> Renew Now</a>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

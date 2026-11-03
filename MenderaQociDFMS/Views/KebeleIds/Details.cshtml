@@ -1,0 +1,82 @@
+@model MenderaQociDFMS.Models.KebeleIdRecord
+@{
+    ViewData["Title"] = $"Kebele ID Details - {Model.IdNumber}";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-success text-white d-flex justify-content-between align-items-center py-3">
+                <h5 class="fw-bold mb-0"><i class="bi bi-card-heading me-2"></i>Kebele ID Record: @Model.IdNumber</h5>
+                <div>
+                    <a asp-action="CardPreview" asp-route-id="@Model.IdRecordId" class="btn btn-warning btn-sm me-2 fw-semibold text-dark"><i class="bi bi-person-badge me-1"></i> Preview & Print ID Card</a>
+                    <button onclick="window.print()" class="btn btn-outline-light btn-sm no-print"><i class="bi bi-printer me-1"></i> Print Record</button>
+                </div>
+            </div>
+            <div class="card-body p-4">
+                <div class="border rounded p-3 bg-light mb-4 text-center">
+                    <h6 class="text-uppercase fw-bold text-success mb-1">Mendera Qoci Kebele Administration Office, Jimma</h6>
+                    <h5 class="fw-bold mb-0">OFFICIAL RESIDENT IDENTIFICATION RECORD</h5>
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="text-muted small">ID Number:</label>
+                        <h5 class="fw-bold text-success">@Model.IdNumber</h5>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="text-muted small">Status:</label>
+                        <div>
+                            @if (Model.IdStatus == "Active" && Model.ExpiryDate >= DateTime.Now)
+                            {
+                                <span class="badge bg-success fs-6">Active</span>
+                            }
+                            else if (Model.ExpiryDate < DateTime.Now || Model.IdStatus == "Expired")
+                            {
+                                <span class="badge bg-warning text-dark fs-6">Expired</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary fs-6">@Model.IdStatus</span>
+                            }
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="text-muted small">Resident Holder Name:</label>
+                        <p class="fw-semibold mb-0">
+                            <a asp-controller="Residents" asp-action="Details" asp-route-id="@Model.ResidentId" class="text-decoration-none">@Model.Resident?.FullName</a>
+                        </p>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="text-muted small">Sub-Kebele Jurisdiction:</label>
+                        <p class="fw-semibold mb-0">@Model.Resident?.SubKebele?.SubKebeleName</p>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="text-muted small">Issue Date:</label>
+                        <p class="fw-semibold mb-0">@Model.IssueDate.ToString("yyyy-MM-dd")</p>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="text-muted small">Expiry Date:</label>
+                        <p class="fw-semibold mb-0">@Model.ExpiryDate.ToString("yyyy-MM-dd")</p>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="text-muted small">Issued By Staff:</label>
+                        <p class="fw-semibold mb-0">@(Model.IssuedByUser?.FullName ?? "System Officer")</p>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="text-muted small">Remarks:</label>
+                        <p class="mb-0 text-muted">@(Model.Remarks ?? "N/A")</p>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-between pt-4 mt-4 border-top no-print">
+                    <a asp-action="Index" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i> Back to Kebele IDs</a>
+                    @if (Model.IdStatus == "Active")
+                    {
+                        <a asp-action="Renew" asp-route-id="@Model.IdRecordId" class="btn btn-success"><i class="bi bi-arrow-repeat me-1"></i> Renew ID Card</a>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

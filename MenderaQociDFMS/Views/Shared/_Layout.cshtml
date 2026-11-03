@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Mendera Qoci DFMS</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" />
+    <style>
+        :root {
+            --kebele-green: #1b5e20;
+            --kebele-green-light: #2e7d32;
+            --kebele-gold: #fbc02d;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+        }
+        .navbar-kebele {
+            background-color: var(--kebele-green) !important;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+        }
+        .navbar-kebele .navbar-brand {
+            color: #ffffff;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+        .navbar-kebele .nav-link {
+            color: rgba(255,255,255,0.9);
+            font-weight: 500;
+            margin-right: 4px;
+        }
+        .navbar-kebele .nav-link:hover, .navbar-kebele .nav-link.active {
+            color: var(--kebele-gold);
+        }
+        .card-summary {
+            border: none;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+            transition: transform 0.15s ease-in-out;
+        }
+        .card-summary:hover {
+            transform: translateY(-2px);
+        }
+        .btn-kebele {
+            background-color: var(--kebele-green);
+            color: #ffffff;
+        }
+        .btn-kebele:hover {
+            background-color: var(--kebele-green-light);
+            color: #ffffff;
+        }
+        .kebele-header {
+            border-bottom: 2px solid var(--kebele-green);
+            padding-bottom: 8px;
+            margin-bottom: 20px;
+        }
+        @@media print {
+            .no-print { display: none !important; }
+            .content-print { width: 100% !important; margin: 0 !important; }
+        }
+    </style>
+</head>
+<body>
+    <header class="no-print">
+        <nav class="navbar navbar-expand-lg navbar-dark navbar-kebele py-2">
+            <div class="container-fluid px-4">
+                <a class="navbar-brand" asp-controller="Dashboard" asp-action="Index">
+                    <i class="bi bi-bank2 me-2"></i>Mendera Qoci DFMS
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarContent">
+                    @if (User.Identity?.IsAuthenticated == true)
+                    {
+                        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Dashboard" asp-action="Index"><i class="bi bi-speedometer2 me-1"></i> Dashboard</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Residents" asp-action="Index"><i class="bi bi-people me-1"></i> Residents</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="KebeleIds" asp-action="Index"><i class="bi bi-card-heading me-1"></i> Kebele IDs</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Correspondence" asp-action="Index"><i class="bi bi-file-earmark-text me-1"></i> Correspondence</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Search" asp-action="Index"><i class="bi bi-search me-1"></i> Search</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Reports" asp-action="Index"><i class="bi bi-bar-chart-line me-1"></i> Reports</a>
+                            </li>
+                            @if (User.IsInRole("Admin"))
+                            {
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle text-warning" href="#" role="button" data-bs-toggle="dropdown">
+                                        <i class="bi bi-shield-lock me-1"></i> Admin Setup
+                                    </a>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item" asp-controller="SubKebeles" asp-action="Index"><i class="bi bi-geo-alt me-2"></i> Sub-Kebeles</a></li>
+                                        <li><a class="dropdown-item" asp-controller="Users" asp-action="Index"><i class="bi bi-person-gear me-2"></i> Staff Accounts</a></li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li><a class="dropdown-item" asp-controller="Backup" asp-action="Index"><i class="bi bi-database-down me-2"></i> Database Backup</a></li>
+                                    </ul>
+                                </li>
+                            }
+                        </ul>
+                        <div class="d-flex align-items-center">
+                            <span class="text-white me-3">
+                                <i class="bi bi-person-circle me-1"></i> @User.Identity.Name
+                                @if (User.IsInRole("Admin"))
+                                {
+                                    <span class="badge bg-warning text-dark ms-1">Admin</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-info text-dark ms-1">Staff</span>
+                                }
+                            </span>
+                            <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn btn-outline-light btn-sm"><i class="bi bi-box-arrow-right"></i> Logout</button>
+                            </form>
+                        </div>
+                    }
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <div class="container-fluid px-4 py-3">
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show no-print mb-3" role="alert">
+                <i class="bi bi-check-circle-fill me-2"></i>@TempData["Success"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-danger alert-dismissible fade show no-print mb-3" role="alert">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>@TempData["Error"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+
+        <main role="main">
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer class="footer mt-auto py-3 bg-white border-top no-print text-center text-muted">
+        <div class="container-fluid">
+            <small>Mendera Qoci Kebele Digital File Management System (DFMS) &copy; @DateTime.Now.Year - Jimma, Ethiopia</small>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

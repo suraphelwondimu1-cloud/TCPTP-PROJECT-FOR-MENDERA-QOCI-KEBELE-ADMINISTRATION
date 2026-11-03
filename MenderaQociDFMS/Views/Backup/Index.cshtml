@@ -1,0 +1,65 @@
+@model IEnumerable<System.IO.FileInfo>
+@{
+    ViewData["Title"] = "Database Backup";
+}
+
+<div class="d-flex justify-content-between align-items-center kebele-header">
+    <div>
+        <h3 class="fw-bold text-success mb-0"><i class="bi bi-database-down me-2"></i>Database Backup Management</h3>
+        <span class="text-muted small">Perform manual SQL database backups and review existing archives</span>
+    </div>
+    <form asp-action="CreateBackup" method="post" class="d-inline">
+        @Html.AntiForgeryToken()
+        <button type="submit" class="btn btn-kebele fw-semibold"><i class="bi bi-play-circle me-1"></i> Initiate Backup Now</button>
+    </form>
+</div>
+
+<div class="alert alert-info d-flex align-items-center mb-4">
+    <i class="bi bi-shield-check fs-3 me-3 text-success"></i>
+    <div>
+        <h6 class="fw-bold mb-1">Administrative Backup Policy</h6>
+        <p class="mb-0 small">Manual backup exports the entire database structure, residents, Kebele ID history, and correspondence into a timestamped SQL dump file stored securely on the local server.</p>
+    </div>
+</div>
+
+<div class="card border-0 shadow-sm">
+    <div class="card-header bg-white fw-bold py-3">
+        <i class="bi bi-clock-history text-success me-2"></i>Existing Database Backup Files
+    </div>
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Backup File Name</th>
+                    <th>Date Generated</th>
+                    <th>File Size</th>
+                    <th>Storage Location</th>
+                    <th class="text-center">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!Model.Any())
+                {
+                    <tr>
+                        <td colspan="5" class="text-center py-4 text-muted">No database backup files generated yet. Click 'Initiate Backup Now' above.</td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var file in Model)
+                    {
+                        <tr>
+                            <td class="fw-bold text-success">@file.Name</td>
+                            <td>@file.CreationTime.ToString("yyyy-MM-dd HH:mm:ss")</td>
+                            <td>@((file.Length / 1024.0).ToString("F2")) KB</td>
+                            <td class="small text-muted">Backups/@file.Name</td>
+                            <td class="text-center">
+                                <a asp-action="Download" asp-route-fileName="@file.Name" class="btn btn-sm btn-outline-success"><i class="bi bi-download me-1"></i> Download SQL</a>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

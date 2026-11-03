@@ -1,0 +1,60 @@
+@model MenderaQociDFMS.Models.Correspondence
+@{
+    ViewData["Title"] = "Record Official Document";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-7">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-success text-white py-3">
+                <h5 class="fw-bold mb-0"><i class="bi bi-file-earmark-plus me-2"></i>Record Official Document / Correspondence</h5>
+            </div>
+            <div class="card-body p-4">
+                <form asp-action="Create" method="post">
+                    @Html.AntiForgeryToken()
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2 small mb-3"></div>
+
+                    <div class="mb-3">
+                        <label asp-for="ResidentId" class="form-label fw-semibold">Select Resident</label>
+                        <select asp-for="ResidentId" asp-items="ViewBag.ResidentId" class="form-select">
+                            <option value="">-- Choose Resident --</option>
+                        </select>
+                        <span asp-validation-for="ResidentId" class="text-danger small"></span>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label asp-for="DocumentType" class="form-label fw-semibold"></label>
+                            <select asp-for="DocumentType" asp-items="ViewBag.DocumentTypes" class="form-select">
+                                <option value="">-- Select Document Type --</option>
+                            </select>
+                            <span asp-validation-for="DocumentType" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="ReferenceNumber" class="form-label fw-semibold"></label>
+                            <input asp-for="ReferenceNumber" class="form-control" />
+                            <span asp-validation-for="ReferenceNumber" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="IssueDate" class="form-label fw-semibold"></label>
+                        <input asp-for="IssueDate" class="form-control" type="date" />
+                        <span asp-validation-for="IssueDate" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-4">
+                        <label asp-for="Purpose" class="form-label fw-semibold">Document Purpose & Details</label>
+                        <textarea asp-for="Purpose" class="form-control" rows="3" placeholder="e.g., Support letter for university admission, residence proof for bank account creation..."></textarea>
+                        <span asp-validation-for="Purpose" class="text-danger small"></span>
+                    </div>
+
+                    <div class="d-flex justify-content-between pt-3 border-top">
+                        <a asp-action="Index" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i> Cancel</a>
+                        <button type="submit" class="btn btn-success fw-semibold"><i class="bi bi-check-circle me-1"></i> Save Correspondence Record</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,59 @@
+@model MenderaQociDFMS.ViewModels.ResidentReportViewModel
+@{
+    ViewData["Title"] = "Resident Summary Report";
+}
+
+<div class="d-flex justify-content-between align-items-center kebele-header">
+    <div>
+        <h3 class="fw-bold text-success mb-0"><i class="bi bi-people me-2"></i>Resident Demographics Summary Report</h3>
+        <span class="text-muted small">Generated on: @DateTime.Now.ToString("yyyy-MM-dd HH:mm")</span>
+    </div>
+    <button onclick="window.print()" class="btn btn-dark btn-sm no-print"><i class="bi bi-printer me-1"></i> Print Report</button>
+</div>
+
+<div class="card border-0 shadow-sm p-4">
+    <div class="row text-center mb-4">
+        <div class="col-md-4">
+            <div class="p-3 border rounded bg-light">
+                <span class="text-muted d-block">Total Residents</span>
+                <h2 class="fw-bold text-success">@Model.TotalResidents</h2>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="p-3 border rounded bg-light">
+                <span class="text-muted d-block">Active Registered</span>
+                <h2 class="fw-bold text-primary">@Model.ActiveResidents</h2>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="p-3 border rounded bg-light">
+                <span class="text-muted d-block">Inactive / Transferred</span>
+                <h2 class="fw-bold text-secondary">@Model.InactiveResidents</h2>
+            </div>
+        </div>
+    </div>
+
+    <h5 class="fw-bold text-success mb-3">Breakdown by Sub-Kebele Jurisdiction</h5>
+    <div class="table-responsive">
+        <table class="table table-bordered align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Sub-Kebele Zone</th>
+                    <th class="text-center">Total Residents Assigned</th>
+                    <th class="text-center">Percentage of Population</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.BySubKebele)
+                {
+                    var pct = Model.TotalResidents > 0 ? (double)item.Count / Model.TotalResidents * 100 : 0;
+                    <tr>
+                        <td class="fw-semibold">@item.SubKebeleName</td>
+                        <td class="text-center fw-bold">@item.Count</td>
+                        <td class="text-center">@pct.ToString("F1")%</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

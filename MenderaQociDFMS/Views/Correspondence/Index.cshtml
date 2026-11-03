@@ -1,0 +1,97 @@
+@model IEnumerable<MenderaQociDFMS.Models.Correspondence>
+@{
+    ViewData["Title"] = "Official Correspondence";
+}
+
+<div class="d-flex justify-content-between align-items-center kebele-header">
+    <div>
+        <h3 class="fw-bold text-success mb-0"><i class="bi bi-file-earmark-text me-2"></i>Official Correspondence Records</h3>
+        <span class="text-muted small">Log and retrieve official letters & certificates issued to residents</span>
+    </div>
+    <a asp-action="Create" class="btn btn-kebele"><i class="bi bi-file-earmark-plus me-1"></i> Record New Document</a>
+</div>
+
+<!-- Search & Filter Card -->
+<div class="card border-0 shadow-sm mb-4">
+    <div class="card-body py-3">
+        <form method="get" asp-action="Index" class="row g-2 align-items-center">
+            <div class="col-md-5">
+                <input type="text" name="searchString" value="@ViewBag.SearchString" class="form-control" placeholder="Search by Reference Number, Purpose, or Resident Name..." />
+            </div>
+            <div class="col-md-4">
+                <select name="docType" class="form-select">
+                    <option value="">-- All Document Types --</option>
+                    @foreach (var dt in (List<string>)ViewBag.DocumentTypes)
+                    {
+                        <option value="@dt" selected="@(ViewBag.DocType == dt)">@dt</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-3 d-flex gap-1">
+                <button type="submit" class="btn btn-success w-100"><i class="bi bi-search me-1"></i> Filter</button>
+                <a asp-action="Index" class="btn btn-outline-secondary"><i class="bi bi-arrow-counterclockwise"></i></a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Correspondence Table -->
+<div class="card border-0 shadow-sm">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Ref Number</th>
+                    <th>Resident Name</th>
+                    <th>Document Type</th>
+                    <th>Issue Date</th>
+                    <th>Purpose</th>
+                    <th>Issued By</th>
+                    <th class="text-center">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!Model.Any())
+                {
+                    <tr>
+                        <td colspan="7" class="text-center py-4 text-muted">No correspondence records found.</td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td class="fw-bold text-success">@item.ReferenceNumber</td>
+                            <td class="fw-semibold">
+                                <a asp-controller="Residents" asp-action="Details" asp-route-id="@item.ResidentId" class="text-decoration-none">@item.Resident?.FullName</a>
+                            </td>
+                            <td><span class="badge bg-light text-dark border">@item.DocumentType</span></td>
+                            <td>@item.IssueDate.ToString("yyyy-MM-dd")</td>
+                            <td class="small text-muted" style="max-width:250px;">@item.Purpose</td>
+                            <td class="small">@(item.IssuedByUser?.FullName ?? "Staff")</td>
+                            <td class="text-center">
+                                <a asp-action="Details" asp-route-id="@item.CorrespondenceId" class="btn btn-sm btn-outline-primary"><i class="bi bi-eye"></i> Details</a>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Pagination -->
+@if (ViewBag.TotalPages > 1)
+{
+    <nav class="mt-3">
+        <ul class="pagination justify-content-center">
+            @for (int i = 1; i <= ViewBag.TotalPages; i++)
+            {
+                <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                    <a class="page-link" asp-action="Index" asp-route-page="@i" asp-route-searchString="@ViewBag.SearchString" asp-route-docType="@ViewBag.DocType">@i</a>
+                </li>
+            }
+        </ul>
+    </nav>
+}

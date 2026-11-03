@@ -1,0 +1,65 @@
+@model MenderaQociDFMS.Models.KebeleIdRecord
+@{
+    ViewData["Title"] = "Renew Kebele ID";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-7">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-success text-white py-3">
+                <h5 class="fw-bold mb-0"><i class="bi bi-arrow-repeat me-2"></i>Renew Kebele ID Card</h5>
+            </div>
+            <div class="card-body p-4">
+                <div class="alert alert-info py-2 small mb-3">
+                    <i class="bi bi-info-circle me-1"></i> Continuous Renewal Policy: Overwriting historical ID records is prohibited. A new official ID record will be logged while marking the previous ID as renewed/expired.
+                </div>
+
+                <form asp-action="Renew" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="oldRecordId" value="@ViewContext.RouteData.Values["id"]" />
+                    <input type="hidden" asp-for="ResidentId" />
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2 small mb-3"></div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Resident</label>
+                        <input type="text" class="form-control bg-light" value="@Model.Resident?.FullName" readonly />
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="IdNumber" class="form-label fw-semibold">New Generated ID Number</label>
+                        <input asp-for="IdNumber" class="form-control" />
+                        <span asp-validation-for="IdNumber" class="text-danger small"></span>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label asp-for="IssueDate" class="form-label fw-semibold">Renewal Issue Date</label>
+                            <input asp-for="IssueDate" class="form-control" type="date" />
+                            <span asp-validation-for="IssueDate" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="ExpiryDate" class="form-label fw-semibold">New Expiry Date</label>
+                            <input asp-for="ExpiryDate" class="form-control" type="date" />
+                            <span asp-validation-for="ExpiryDate" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="IdStatus" class="form-label fw-semibold"></label>
+                        <input asp-for="IdStatus" class="form-control bg-light" readonly value="Active" />
+                    </div>
+
+                    <div class="mb-4">
+                        <label asp-for="Remarks" class="form-label fw-semibold"></label>
+                        <textarea asp-for="Remarks" class="form-control" rows="2"></textarea>
+                    </div>
+
+                    <div class="d-flex justify-content-between pt-3 border-top">
+                        <a asp-action="Index" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i> Cancel</a>
+                        <button type="submit" class="btn btn-success fw-semibold"><i class="bi bi-check-circle me-1"></i> Confirm ID Renewal</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
